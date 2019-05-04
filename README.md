@@ -1,2 +1,2 @@
-# tf_retrieval_baseline
-A Tensorflow retrieval (space embedding) baseline
+# Tensorflow Retrieval Baseline
+This repos leverages triplet-reid  https://github.com/VisualComputingInstitute/triplet-reid repos to create a baseline on retrieval datasets like CUB200, Cars196 and stanford online products. The repos evlauates multiple ranking losses like contrastive, angular, semi-hard and hard triplet loss, lifted struct loss, etc. I will update this repos by the end of May 2019.
