@@ -533,10 +533,11 @@ if __name__ == '__main__':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
         extra_args = [
-            '--batch_p', '4',
-            '--batch_p', '4',
+            '--batch_p', '14',
+            '--batch_k', '10',
             '--flip_augment',
             '--crop_augment',
+
         ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
@@ -545,7 +546,9 @@ if __name__ == '__main__':
     arg_head = 'fc1024_normalize'
     arg_margin = '0.2'
 
-    exp_dir = 'hello_world'
+    exp_dir = [dataset_name,arg_head,arg_loss,'m_{}'.format(arg_margin)]
+    exp_dir = '_'.join(exp_dir)
+
     args = [
         '--image_root', dataset_dir + db_dir,
         '--experiment_root', experiment_root_dir + exp_dir,
@@ -555,8 +558,12 @@ if __name__ == '__main__':
 
         '--train_set', './data/' + train_file,
 
+        '--net_input_height', '224',
+        '--net_input_width', '224',
+        '--pre_crop_height', '256',
+        '--pre_crop_width', '256',
+
         # '--resume',
-        # '--loss', 'batch_hard',
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
