@@ -315,7 +315,7 @@ def main(argv):
 
     weight_decay = 10e-4
     weights_regularizer = tf.contrib.layers.l2_regularizer(scale=weight_decay)
-    endpoints, body_prefix = model.endpoints(images, is_training=True,weight_decay=weight_decay)
+    endpoints, body_prefix = model.endpoints(images, is_training=True)
     with tf.name_scope('head'):
         endpoints = head.head(endpoints, args.embedding_dim, is_training=True,weights_regularizer=weights_regularizer)
 
@@ -533,11 +533,25 @@ if __name__ == '__main__':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
         extra_args = [
-            '--batch_p', '14',
-            '--batch_k', '10',
+            '--batch_p', '10',
+            '--batch_k', '6',
             '--flip_augment',
             '--crop_augment',
 
+        ]
+    elif dataset_name == 'inshop':
+        db_dir = 'In_shop_Clothes_Retrieval_Benchmark'
+        train_file = 'deep_fashion_train.csv'
+        extra_args = [
+            # p_10,k_6
+            '--batch_p', '10',
+            '--batch_k', '6',
+            '--net_input_height', '224',
+            '--net_input_width', '224',
+            '--pre_crop_height', '256',
+            '--pre_crop_width', '256',
+            '--flip_augment',
+            '--crop_augment',
         ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
@@ -546,15 +560,18 @@ if __name__ == '__main__':
     arg_head = 'fc1024_normalize'
     arg_margin = '0.2'
 
-    exp_dir = [dataset_name,arg_head,arg_loss,'m_{}'.format(arg_margin)]
+    exp_dir = [dataset_name,arg_head,arg_loss,'m_{}'.format(arg_margin),'densenet']
     exp_dir = '_'.join(exp_dir)
 
     args = [
         '--image_root', dataset_dir + db_dir,
         '--experiment_root', experiment_root_dir + exp_dir,
 
-        '--initial_checkpoint', trained_models_dir + 'resnet_v1_50/resnet_v1_50.ckpt',
-        '--model_name', 'resnet_v1_50',
+        #'--initial_checkpoint', trained_models_dir + 'resnet_v1_50/resnet_v1_50.ckpt',
+        #'--model_name', 'resnet_v1_50',
+
+        '--initial_checkpoint', trained_models_dir + 'tf-densenet169/tf-densenet169.ckpt',
+        '--model_name', 'densenet169',
 
         '--train_set', './data/' + train_file,
 
