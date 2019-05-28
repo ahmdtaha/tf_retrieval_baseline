@@ -304,11 +304,13 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for subset in ['test']:
-        exp_dir = 'cub_fc1024_normalize_semi_hard_triplet_m_0.2_densenet'
+        exp_dir = 'inshop_fc1024_lifted_loss_m_1.0_densenet'
         folder_name = 'emb'
-        dataset_name = 'cub'
+        dataset_name = 'inshop'
         if dataset_name == 'cub':
             csv_file = 'cub'
+        elif dataset_name == 'inshop':
+            csv_file = 'deep_fashion'
         else:
             raise NotImplementedError('dataset {} not valid'.format(dataset_name))
 

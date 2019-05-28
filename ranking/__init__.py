@@ -2,6 +2,9 @@
 LOSS_CHOICES = (
     'hard_triplet',
     'semi_hard_triplet',
+    'lifted_loss',
+    'npairs_loss',
+
 )
 
 METRIC_CHOICES = [

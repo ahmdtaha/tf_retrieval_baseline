@@ -129,15 +129,18 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('Username {} not valid'.format(username))
 
-    dataset_name = 'cub'
+    dataset_name = 'inshop'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'cub_fc1024_normalize_semi_hard_triplet_m_0.2_densenet'
+    exp_dir = 'inshop_fc1024_lifted_loss_m_1.0_densenet'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 
     if dataset_name == 'cub':
         # db_dir = 'DukeMTMC-reID'
         csv_file = 'cub'
+        excluder = 'diagonal'
+    elif dataset_name == 'inshop':
+        csv_file = 'deep_fashion'
         excluder = 'diagonal'
     else:
         raise  NotImplementedError('dataset {} not valid'.format(dataset_name))

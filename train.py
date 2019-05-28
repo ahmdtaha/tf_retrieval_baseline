@@ -23,7 +23,8 @@ from nets import NET_CHOICES
 from heads import HEAD_CHOICES
 from ranking import LOSS_CHOICES,METRIC_CHOICES
 from ranking.semi_hard_triplet import triplet_semihard_loss
-
+from ranking.lifted_structured import lifted_loss
+from ranking.npair import npairs_loss
 
 parser = ArgumentParser(description='Train a ReID network.')
 
@@ -326,6 +327,8 @@ def main(argv):
     batch_embedding = endpoints['emb']
     if args.loss == 'semi_hard_triplet':
         triplet_loss = triplet_semihard_loss(batch_embedding, pids, args.margin,args.metric)
+    elif args.loss == 'lifted_loss':
+        triplet_loss = lifted_loss(pids, batch_embedding, margin=args.margin)
     # elif args.loss == 'contrastive_loss':
     #     # embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,1)
     #     # anchor_ids, pos_ids = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
@@ -364,14 +367,12 @@ def main(argv):
     #     # pids = tf.Print(pids,[pids],'pids:: ',summarize=100)
     #     triplet_loss = loss.LOSS_CHOICES[args.loss](pids, embeddings_anchor, embeddings_positive,
     #                                                 batch_size=args.batch_p, with_l2reg=True)
-    # elif args.loss == 'npairs_loss':
-    #     embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,
-    #                                                         1)
-    #     pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
-    #     print(pids.shape)
-    #     pids = tf.reshape(pids, [-1])
-    #     print(pids.shape)
-    #     triplet_loss = loss.LOSS_CHOICES[args.loss](pids, embeddings_anchor, embeddings_positive)
+    elif args.loss == 'npairs_loss':
+         assert args.batch_k == 2  ## Single positive pair per class
+         embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,                                                         1)
+         pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
+         pids = tf.reshape(pids, [-1])
+         triplet_loss = npairs_loss(pids, embeddings_anchor, embeddings_positive)
     else:
         raise NotImplementedError('loss function {} NotImplemented'.format(args.loss))
 
@@ -528,7 +529,7 @@ if __name__ == '__main__':
         raise NotImplementedError('User {} not found'.format(username))
 
 
-    dataset_name = 'cub'
+    dataset_name = 'inshop'
     if dataset_name == 'cub':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
@@ -544,8 +545,8 @@ if __name__ == '__main__':
         train_file = 'deep_fashion_train.csv'
         extra_args = [
             # p_10,k_6
-            '--batch_p', '10',
-            '--batch_k', '6',
+            '--batch_p', '30',
+            '--batch_k', '2',
             '--net_input_height', '224',
             '--net_input_width', '224',
             '--pre_crop_height', '256',
@@ -556,9 +557,9 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'semi_hard_triplet'
-    arg_head = 'fc1024_normalize'
-    arg_margin = '0.2'
+    arg_loss = 'npairs_loss'
+    arg_head = 'fc1024'
+    arg_margin = '1.0'
 
     exp_dir = [dataset_name,arg_head,arg_loss,'m_{}'.format(arg_margin),'densenet']
     exp_dir = '_'.join(exp_dir)
@@ -584,7 +585,7 @@ if __name__ == '__main__':
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
-        '--gpu', '0',
+        '--gpu', '1',
     ]
 
     args.extend(extra_args)
