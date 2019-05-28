@@ -6,6 +6,7 @@ This code is based on  [triplet-reid](https://github.com/VisualComputingInstitut
 Evaluation Metrics: Normalized Mutual Information (NMI), Recall@K
 
 ### Deep Fashion In-shop retrieval datasets
+All the following experiments assume a training mini-batch of size 60. The architecture employed is the one used in [In Defense of the Triplet Loss for Person Re-Identification](https://arxiv.org/abs/1703.07737) but ResNet is replaced by a DenseNet169
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
