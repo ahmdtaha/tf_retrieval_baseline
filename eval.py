@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     dataset_name = 'inshop'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'inshop_fc1024_lifted_loss_m_1.0_densenet'
+    exp_dir = 'inshop_fc1024_npairs_loss_m_1.0_densenet'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 

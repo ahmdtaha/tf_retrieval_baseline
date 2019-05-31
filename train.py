@@ -25,6 +25,7 @@ from ranking import LOSS_CHOICES,METRIC_CHOICES
 from ranking.semi_hard_triplet import triplet_semihard_loss
 from ranking.lifted_structured import lifted_loss
 from ranking.npair import npairs_loss
+from ranking.angular import angular_loss
 
 parser = ArgumentParser(description='Train a ReID network.')
 
@@ -359,14 +360,14 @@ def main(argv):
     #     triplet_loss = loss.LOSS_CHOICES[args.loss](pids, batch_embedding, margin=args.margin,
     #                                                 log_var=endpoints['data_sigma'])
     #
-    # elif args.loss == 'angular_loss':
-    #     embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,
-    #                                                         1)
-    #     # pids = tf.Print(pids, [pids], 'pids:: ', summarize=100)
-    #     pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
-    #     # pids = tf.Print(pids,[pids],'pids:: ',summarize=100)
-    #     triplet_loss = loss.LOSS_CHOICES[args.loss](pids, embeddings_anchor, embeddings_positive,
-    #                                                 batch_size=args.batch_p, with_l2reg=True)
+    elif args.loss == 'angular_loss':
+        embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,
+                                                            1)
+        # pids = tf.Print(pids, [pids], 'pids:: ', summarize=100)
+        pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
+        # pids = tf.Print(pids,[pids],'pids:: ',summarize=100)
+        triplet_loss = angular_loss(pids, embeddings_anchor, embeddings_positive,
+                                                    batch_size=args.batch_p, with_l2reg=True)
     elif args.loss == 'npairs_loss':
          assert args.batch_k == 2  ## Single positive pair per class
          embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,                                                         1)
@@ -557,7 +558,7 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'npairs_loss'
+    arg_loss = 'angular_loss'
     arg_head = 'fc1024'
     arg_margin = '1.0'
 

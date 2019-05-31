@@ -304,7 +304,7 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for subset in ['test']:
-        exp_dir = 'inshop_fc1024_lifted_loss_m_1.0_densenet'
+        exp_dir = 'inshop_fc1024_npairs_loss_m_1.0_densenet'
         folder_name = 'emb'
         dataset_name = 'inshop'
         if dataset_name == 'cub':
