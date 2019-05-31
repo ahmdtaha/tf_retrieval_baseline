@@ -10,5 +10,7 @@ All the following experiments assume a training mini-batch of size 60. The archi
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
-| Semi-Hard | Yes | 0.2    | 0.902 | 87.43 | 95.42 | 10| 6|
-| Lifted Structured | No | 1.0    | 0.903 | 87.32 | 95.59 | 10| 6|
+| [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.902 | 87.43 | 95.42 | 10| 6|
+| [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.903 | 87.32 | 95.59 | 10| 6|
+| [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.903 | 89.12 | 96.13 | 2| 30|
+| [Angular Loss](https://github.com/geonm/tf_angular_loss) |  |     |  |  |  | | |
