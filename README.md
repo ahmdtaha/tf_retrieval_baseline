@@ -13,7 +13,7 @@ All the following experiments assume a training mini-batch of size 60. The archi
 | [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.902 | 87.43 | 95.42 | 10| 6|
 | [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.903 | 87.32 | 95.59 | 10| 6|
 | [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.903 | 89.12 | 96.13 | 2| 30|
-| [Angular Loss](https://github.com/geonm/tf_angular_loss) | No | N/A  |  |  |  | 2| 30|
+| [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A  | 0.8931 |  84.70 | 92.32 | 2| 30|
 
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
