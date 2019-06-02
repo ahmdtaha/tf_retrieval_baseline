@@ -26,6 +26,7 @@ from ranking.semi_hard_triplet import triplet_semihard_loss
 from ranking.lifted_structured import lifted_loss
 from ranking.npair import npairs_loss
 from ranking.angular import angular_loss
+from ranking.contrastive import contrastive_loss
 
 parser = ArgumentParser(description='Train a ReID network.')
 
@@ -330,36 +331,30 @@ def main(argv):
         triplet_loss = triplet_semihard_loss(batch_embedding, pids, args.margin,args.metric)
     elif args.loss == 'lifted_loss':
         triplet_loss = lifted_loss(pids, batch_embedding, margin=args.margin)
-    # elif args.loss == 'contrastive_loss':
-    #     # embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,1)
-    #     # anchor_ids, pos_ids = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
-    #     assert batch_size % 2 == 0
-    #     assert args.batch_k == 4  ## Can work with other number but will need tuning
-    #
-    #     contrastive_idx = np.tile([0, 1, 4, 3, 2, 5, 6, 7], args.batch_p // 2)
-    #     for i in range(args.batch_p // 2):
-    #         contrastive_idx[i * 8:i * 8 + 8] += i * 8
-    #
-    #     contrastive_idx = np.expand_dims(contrastive_idx, 1)
-    #     batch_embedding_ordered = tf.gather_nd(batch_embedding, contrastive_idx)
-    #     pids_ordered = tf.gather_nd(pids, contrastive_idx)
-    #     # batch_embedding_ordered = tf.Print(batch_embedding_ordered,[pids_ordered],'pids_ordered :: ',summarize=1000)
-    #     embeddings_anchor, embeddings_positive = tf.unstack(
-    #         tf.reshape(batch_embedding_ordered, [-1, 2, args.embedding_dim]), 2,
-    #         1)
-    #     # embeddings_anchor = tf.Print(embeddings_anchor,[pids_ordered,embeddings_anchor,embeddings_positive,batch_embedding,batch_embedding_ordered],"Tensors ", summarize=1000)
-    #
-    #     fixed_labels = np.tile([1, 0, 0, 1], args.batch_p // 2)
-    #     # fixed_labels = np.reshape(fixed_labels,(len(fixed_labels),1))
-    #     # print(fixed_labels)
-    #     labels = tf.constant(fixed_labels)
-    #     # labels = tf.Print(labels,[labels],'labels ',summarize=1000)
-    #     triplet_loss = loss.LOSS_CHOICES[args.loss](labels, embeddings_anchor, embeddings_positive,
-    #                                                 margin=args.margin, log_var=None)
-    # elif args.loss == 'lifted_loss' or args.loss == 'soft_lifted_loss':
-    #     triplet_loss = loss.LOSS_CHOICES[args.loss](pids, batch_embedding, margin=args.margin,
-    #                                                 log_var=endpoints['data_sigma'])
-    #
+    elif args.loss == 'contrastive_loss':
+        assert batch_size % 2 == 0
+        assert args.batch_k == 4  ## Can work with other number but will need tuning
+
+        contrastive_idx = np.tile([0, 1, 4, 3, 2, 5, 6, 7], args.batch_p // 2)
+        for i in range(args.batch_p // 2):
+            contrastive_idx[i * 8:i * 8 + 8] += i * 8
+
+        contrastive_idx = np.expand_dims(contrastive_idx, 1)
+        batch_embedding_ordered = tf.gather_nd(batch_embedding, contrastive_idx)
+        pids_ordered = tf.gather_nd(pids, contrastive_idx)
+        # batch_embedding_ordered = tf.Print(batch_embedding_ordered,[pids_ordered],'pids_ordered :: ',summarize=1000)
+        embeddings_anchor, embeddings_positive = tf.unstack(
+            tf.reshape(batch_embedding_ordered, [-1, 2, args.embedding_dim]), 2,
+            1)
+        # embeddings_anchor = tf.Print(embeddings_anchor,[pids_ordered,embeddings_anchor,embeddings_positive,batch_embedding,batch_embedding_ordered],"Tensors ", summarize=1000)
+
+        fixed_labels = np.tile([1, 0, 0, 1], args.batch_p // 2)
+        # fixed_labels = np.reshape(fixed_labels,(len(fixed_labels),1))
+        # print(fixed_labels)
+        labels = tf.constant(fixed_labels)
+        # labels = tf.Print(labels,[labels],'labels ',summarize=1000)
+        triplet_loss = contrastive_loss(labels, embeddings_anchor, embeddings_positive,
+                                                    margin=args.margin)
     elif args.loss == 'angular_loss':
         embeddings_anchor, embeddings_positive = tf.unstack(tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,
                                                             1)
@@ -530,50 +525,39 @@ if __name__ == '__main__':
         raise NotImplementedError('User {} not found'.format(username))
 
 
-    dataset_name = 'inshop'
+    dataset_name = 'cub'
     if dataset_name == 'cub':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
         extra_args = [
-            '--batch_p', '10',
+            '--batch_p', '20',
             '--batch_k', '6',
-            '--flip_augment',
-            '--crop_augment',
-
         ]
     elif dataset_name == 'inshop':
         db_dir = 'In_shop_Clothes_Retrieval_Benchmark'
         train_file = 'deep_fashion_train.csv'
         extra_args = [
             # p_10,k_6
-            '--batch_p', '30',
-            '--batch_k', '2',
-            '--net_input_height', '224',
-            '--net_input_width', '224',
-            '--pre_crop_height', '256',
-            '--pre_crop_width', '256',
-            '--flip_augment',
-            '--crop_augment',
+            '--batch_p', '15',
+            '--batch_k', '4',
         ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'angular_loss'
-    arg_head = 'fc1024'
-    arg_margin = '1.0'
+    arg_loss = 'semi_hard_triplet'
+    arg_head = 'direct_normalize'
+    arg_margin = '0.2'
+    arg_arch = 'resnet'
 
-    exp_dir = [dataset_name,arg_head,arg_loss,'m_{}'.format(arg_margin),'densenet']
+
+    exp_dir = [dataset_name,arg_arch,arg_head,arg_loss,'m_{}'.format(arg_margin),'1']
     exp_dir = '_'.join(exp_dir)
+
 
     args = [
         '--image_root', dataset_dir + db_dir,
         '--experiment_root', experiment_root_dir + exp_dir,
 
-        #'--initial_checkpoint', trained_models_dir + 'resnet_v1_50/resnet_v1_50.ckpt',
-        #'--model_name', 'resnet_v1_50',
-
-        '--initial_checkpoint', trained_models_dir + 'tf-densenet169/tf-densenet169.ckpt',
-        '--model_name', 'densenet169',
 
         '--train_set', './data/' + train_file,
 
@@ -582,12 +566,31 @@ if __name__ == '__main__':
         '--pre_crop_height', '256',
         '--pre_crop_width', '256',
 
+        '--flip_augment',
+        '--crop_augment',
+
         # '--resume',
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
         '--gpu', '1',
     ]
+
+    if arg_arch == 'resnet':
+        args.extend(
+            [
+                '--initial_checkpoint', trained_models_dir + 'resnet_v1_50/resnet_v1_50.ckpt',
+                '--model_name', 'resnet_v1_50',
+            ]
+        )
+    elif arg_arch == 'densenet':
+        args.extend(
+            [
+                '--initial_checkpoint', trained_models_dir + 'tf-densenet169/tf-densenet169.ckpt',
+                '--model_name', 'densenet169',
+            ]
+        )
+
 
     args.extend(extra_args)
 

@@ -302,11 +302,11 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('Username {} not valid'.format(username))
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     for subset in ['test']:
-        exp_dir = 'inshop_fc1024_npairs_loss_m_1.0_densenet'
+        exp_dir = 'cub_direct_normalize_semi_hard_triplet_m_0.2_direct_normalize_1'
         folder_name = 'emb'
-        dataset_name = 'inshop'
+        dataset_name = 'cub'
         if dataset_name == 'cub':
             csv_file = 'cub'
         elif dataset_name == 'inshop':
