@@ -4,4 +4,5 @@ NET_CHOICES = (
     'resnet_v1_50',
     'resnet_v1_101',
     'densenet169',
+    'inception_v1',
 )

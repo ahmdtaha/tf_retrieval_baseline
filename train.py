@@ -547,7 +547,7 @@ if __name__ == '__main__':
     arg_loss = 'semi_hard_triplet'
     arg_head = 'direct_normalize'
     arg_margin = '0.2'
-    arg_arch = 'resnet'
+    arg_arch = 'inc_v1'
 
 
     exp_dir = [dataset_name,arg_arch,arg_head,arg_loss,'m_{}'.format(arg_margin),'1']
@@ -581,6 +581,13 @@ if __name__ == '__main__':
             [
                 '--initial_checkpoint', trained_models_dir + 'resnet_v1_50/resnet_v1_50.ckpt',
                 '--model_name', 'resnet_v1_50',
+            ]
+        )
+    if arg_arch == 'inc_v1':
+        args.extend(
+            [
+                '--initial_checkpoint', trained_models_dir + 'inception_v1/inception_v1.ckpt',
+                '--model_name', 'inception_v1',
             ]
         )
     elif arg_arch == 'densenet':

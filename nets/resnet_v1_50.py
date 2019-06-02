@@ -16,6 +16,4 @@ def endpoints(image, is_training,weight_decay=0.0):
     endpoints['model_output'] = endpoints['global_pool'] = tf.reduce_mean(
         endpoints['resnet_v1_50/block4'], [1, 2], name='pool5')
 
-    endpoints['attention'] = endpoints['resnet_v1_50/block4']
-
     return endpoints, 'resnet_v1_50'
