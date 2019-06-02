@@ -153,12 +153,6 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
@@ -179,12 +173,6 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
 
         end_points[end_point] = net
@@ -206,12 +194,6 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
@@ -231,13 +213,6 @@ def inception_v1_base(inputs,
             branch_3 = slim.conv2d(branch_3, 64, [1, 1], scope='Conv2d_0b_1x1')
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
-
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
 
         end_points[end_point] = net
@@ -259,12 +234,7 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
+
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
 
@@ -289,12 +259,6 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
@@ -315,13 +279,6 @@ def inception_v1_base(inputs,
           net = tf.concat(
               axis=3, values=[branch_0, branch_1, branch_2, branch_3])
 
-
-        atten_var = tf.get_variable("atten_" + end_point, [net.shape[1], net.shape[2], 1], dtype=tf.float32,
-                                    initializer=tf.contrib.layers.xavier_initializer())
-        print(atten_var)
-        atten_var_norm = atten_var / tf.norm(atten_var)
-        atten_var_gate = tf.Variable(False, name="gate_" + end_point)
-        net = tf.cond(atten_var_gate, lambda: tf.multiply(atten_var_norm, net), lambda: tf.identity(net))
 
         end_points[end_point] = net
         if final_endpoint == end_point: return net, end_points
