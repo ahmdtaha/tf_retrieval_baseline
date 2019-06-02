@@ -371,4 +371,4 @@ def endpoints(image, is_training,weight_decay=0.0):
 
         endpoints['model_output'] = endpoints['global_pool'] = tf.reduce_mean(endpoints['global_pool'], [1, 2], name='pool5')
 
-    return endpoints, 'inception_v1'
+    return endpoints, 'InceptionV1'
