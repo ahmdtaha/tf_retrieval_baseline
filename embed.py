@@ -304,7 +304,7 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     for subset in ['test']:
-        exp_dir = 'cub_direct_normalize_semi_hard_triplet_m_0.2_direct_normalize_1'
+        exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2_iterations_10K_20_6_momentum'
         folder_name = 'emb'
         dataset_name = 'cub'
         if dataset_name == 'cub':

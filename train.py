@@ -28,6 +28,13 @@ from ranking.npair import npairs_loss
 from ranking.angular import angular_loss
 from ranking.contrastive import contrastive_loss
 
+
+OPTIMIZER_CHOICES = (
+    'adam',
+    'momentum',
+)
+
+
 parser = ArgumentParser(description='Train a ReID network.')
 
 # Required.
@@ -58,6 +65,10 @@ parser.add_argument(
 
 parser.add_argument(
     '--head_name', default='fc1024', choices=HEAD_CHOICES,
+    help='Name of the head to use.')
+
+parser.add_argument(
+    '--optimizer', default='adam', choices=OPTIMIZER_CHOICES,
     help='Name of the head to use.')
 
 parser.add_argument(
@@ -392,13 +403,17 @@ def main(argv):
     else:
         learning_rate = args.learning_rate
 
-    optimizer = tf.train.AdamOptimizer(learning_rate)
-
+    if args.optimizer == 'adam':
+        optimizer = tf.train.AdamOptimizer(learning_rate)
+    elif args.optimizer == 'momentum':
+        optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=0.9)
+    else:
+        raise NotImplementedError('Invalid optimizer {}'.format(args.optimizer))
     #
     # learning_rate = tf.train.polynomial_decay(args.learning_rate, global_step,
     #                                           args.train_iterations, end_learning_rate= 1e-7,
     #                                           power=1)
-    # optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=0.9)
+    #
 
     # Feel free to try others!
     # optimizer = tf.train.AdadeltaOptimizer(learning_rate)
@@ -532,6 +547,7 @@ if __name__ == '__main__':
         extra_args = [
             '--batch_p', '20',
             '--batch_k', '6',
+            '--train_iterations','10000',
         ]
     elif dataset_name == 'inshop':
         db_dir = 'In_shop_Clothes_Retrieval_Benchmark'
@@ -548,9 +564,10 @@ if __name__ == '__main__':
     arg_head = 'direct_normalize'
     arg_margin = '0.2'
     arg_arch = 'inc_v1'
+    arg_optimizer = 'momentum'
 
 
-    exp_dir = [dataset_name,arg_arch,arg_head,arg_loss,'m_{}'.format(arg_margin),'1']
+    exp_dir = [dataset_name,arg_arch,arg_head,arg_loss,'m_{}'.format(arg_margin),'iterations_10K_20_6',arg_optimizer]
     exp_dir = '_'.join(exp_dir)
 
 
@@ -573,9 +590,11 @@ if __name__ == '__main__':
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
-        '--gpu', '1',
+        '--gpu', '0',
     ]
-
+    args.extend([
+        '--optimizer',arg_optimizer,
+    ])
     if arg_arch == 'resnet':
         args.extend(
             [
