@@ -5,8 +5,9 @@ This repository provides a retrieval/space embedding baseline using multiple ret
 1. Normalized Mutual Information (NMI)
 2. Recall@K
 
-### Deep Fashion In-shop retrieval datasets
+### Deep Fashion In-shop Retrieval Evaluation
 All the following experiments assume a training mini-batch of size 60. The architecture employed is the one used in [In Defense of the Triplet Loss for Person Re-Identification](https://arxiv.org/abs/1703.07737) but ResNet is replaced by a DenseNet169
+Optimizer: Adam, Number of iterations = 25K
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
@@ -15,6 +16,14 @@ All the following experiments assume a training mini-batch of size 60. The archi
 | [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.903 | 89.12 | 96.13 | 2| 30|
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A  | 0.8931 |  84.70 | 92.32 | 2| 30|
 | Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0  | 0.826 |  44.09 | 67.17 | 4| 15|
+
+### CUB200-2011 Retrieval Evaluation
+Mini-batch of size=120. Architecture: Inception_Net V1.
+Optimizer: Momentum. Number of iterations = 10K
+
+| Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
+|-----------|------------|--------|-------|-------|-------|--------------|--------------------|
+| [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.587 | 49.03 | 73.43 | 20| 6|
 
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
