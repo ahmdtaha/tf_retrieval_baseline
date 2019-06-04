@@ -18,12 +18,16 @@ Optimizer: Adam, Number of iterations = 25K
 | Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0  | 0.826 |  44.09 | 67.17 | 4| 15|
 
 ### CUB200-2011 Retrieval Evaluation
-Mini-batch of size=120. Architecture: Inception_Net V1.
+Mini-batch size=120. Architecture: Inception_Net V1.
 Optimizer: Momentum. Number of iterations = 10K
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
 | [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.587 | 49.03 | 73.43 | 20| 6|
+| [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.502 | 35.26 | 59.82 | 20| 6|
+| [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.573 | 46.52 | 59.26 | 60| 2|
+| [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.546 | 45.50 | 68.43 | 60 | 2|
+| Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0    | 0.476 | 37.27 | 62.39 | 30| 4|
 
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
@@ -36,6 +40,7 @@ Optimizer: Momentum. Number of iterations = 10K
 
 ### TODO
 * [TODO] bash script for train, embed and then eval
+* [TODO] Explain the fast contrastive loss sampling procedure
 * [TODO] Explain why contrastive loss is different from [tf.contrib.losses.metric_learning.contrastive\_loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss)
 * [TODO] Evaluate on CUB (a small dataset) with a small architecture like ResNet
 * [TODO] Evaluate space embedding during training.
