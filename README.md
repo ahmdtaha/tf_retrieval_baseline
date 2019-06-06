@@ -12,6 +12,7 @@ Optimizer: Adam, Number of iterations = 25K
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
 | [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.902 | 87.43 | 95.42 | 10| 6|
+| Hard-Negative | No | 1.0    | 0.904 | 88.38 | 95.74 | 10| 6|
 | [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.903 | 87.32 | 95.59 | 10| 6|
 | [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.903 | 89.12 | 96.13 | 2| 30|
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A  | 0.8931 |  84.70 | 92.32 | 2| 30|
@@ -24,6 +25,7 @@ Optimizer: Momentum. Number of iterations = 10K
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
 | [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.587 | 49.03 | 73.43 | 20| 6|
+| Hard Negatives | No | 1.0    | 0.561 | 46.55 | 71.03 | 20| 6|
 | [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.502 | 35.26 | 59.82 | 20| 6|
 | [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.573 | 46.52 | 59.26 | 60| 2|
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.546 | 45.50 | 68.43 | 60 | 2|
