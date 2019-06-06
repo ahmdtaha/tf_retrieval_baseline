@@ -140,7 +140,7 @@ def pairwise_distance(feature, squared=False):
   pairwise_distances = math_ops.multiply(pairwise_distances, mask_offdiagonals)
   return pairwise_distances
 
-def triplet_semihard_loss(embeddings,labels, margin=1.0,metric='euclidean'):
+def triplet_semihard_loss(embeddings,labels, margin=1.0):
   """Computes the triplet loss with semi-hard negative mining.
 
   The loss encourages the positive distances (between a pair of embeddings with

@@ -22,6 +22,7 @@ import lbtoolbox as lb
 from nets import NET_CHOICES
 from heads import HEAD_CHOICES
 from ranking import LOSS_CHOICES,METRIC_CHOICES
+from ranking.hard_triplet import batch_hard
 from ranking.semi_hard_triplet import triplet_semihard_loss
 from ranking.lifted_structured import lifted_loss
 from ranking.npair import npairs_loss
@@ -339,7 +340,9 @@ def main(argv):
     # batch_embedding = endpoints['emb']
     batch_embedding = endpoints['emb']
     if args.loss == 'semi_hard_triplet':
-        triplet_loss = triplet_semihard_loss(batch_embedding, pids, args.margin,args.metric)
+        triplet_loss = triplet_semihard_loss(batch_embedding, pids, args.margin)
+    elif args.loss == 'hard_triplet':
+        triplet_loss = batch_hard(batch_embedding, pids, args.margin, args.metric)
     elif args.loss == 'lifted_loss':
         triplet_loss = lifted_loss(pids, batch_embedding, margin=args.margin)
     elif args.loss == 'contrastive_loss':
@@ -540,7 +543,8 @@ if __name__ == '__main__':
         raise NotImplementedError('User {} not found'.format(username))
 
 
-    dataset_name = 'cub'
+    dataset_name = 'inshop'
+
     if dataset_name == 'cub':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
@@ -548,32 +552,34 @@ if __name__ == '__main__':
             '--batch_p', '20',
             '--batch_k', '6',
             '--train_iterations','10000',
+            '--optimizer', 'momentum',
         ]
     elif dataset_name == 'inshop':
         db_dir = 'In_shop_Clothes_Retrieval_Benchmark'
         train_file = 'deep_fashion_train.csv'
         extra_args = [
             # p_10,k_6
-            '--batch_p', '15',
-            '--batch_k', '4',
+            '--batch_p', '10',
+            '--batch_k', '6',
+            '--optimizer', 'adam',
         ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'semi_hard_triplet'
-    arg_head = 'direct_normalize'
-    arg_margin = '0.2'
-    arg_arch = 'inc_v1'
-    arg_optimizer = 'momentum'
+    arg_loss = 'hard_triplet'
+    arg_head = 'fc1024'
+    arg_margin = '1.0'
+    arg_arch = 'densenet'
 
 
-    exp_dir = [dataset_name,arg_arch,arg_head,arg_loss,'m_{}'.format(arg_margin),'iterations_10K_20_6',arg_optimizer]
-    exp_dir = '_'.join(exp_dir)
+
+    exp_name = [dataset_name, arg_arch, arg_head, arg_loss, 'm_{}'.format(arg_margin)]
+    exp_name = '_'.join(exp_name)
 
 
     args = [
         '--image_root', dataset_dir + db_dir,
-        '--experiment_root', experiment_root_dir + exp_dir,
+        '--experiment_root', experiment_root_dir + exp_name,
 
 
         '--train_set', './data/' + train_file,
@@ -593,7 +599,7 @@ if __name__ == '__main__':
         '--gpu', '0',
     ]
     args.extend([
-        '--optimizer',arg_optimizer,
+
     ])
     if arg_arch == 'resnet':
         args.extend(

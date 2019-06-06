@@ -129,9 +129,9 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('Username {} not valid'.format(username))
 
-    dataset_name = 'cub'
+    dataset_name = 'inshop'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2_iterations_10K_20_6_momentum'
+    exp_dir = 'inshop_densenet_fc1024_hard_triplet_m_1.0'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 
