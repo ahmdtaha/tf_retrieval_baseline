@@ -6,7 +6,7 @@ This repository provides a retrieval/space embedding baseline using multiple ret
 2. Recall@K
 
 ### Deep Fashion In-shop Retrieval Evaluation
-All the following experiments assume a training mini-batch of size 60. The architecture employed is the one used in [In Defense of the Triplet Loss for Person Re-Identification](https://arxiv.org/abs/1703.07737) but ResNet is replaced by a DenseNet169
+All the following experiments assume a training mini-batch of size 60. The architecture employed is the one used in [In Defense of the Triplet Loss for Person Re-Identification](https://arxiv.org/abs/1703.07737) but ResNet is replaced by a DenseNet169.
 Optimizer: Adam, Number of iterations = 25K
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
@@ -31,14 +31,23 @@ Optimizer: Momentum. Number of iterations = 10K
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.546 | 45.50 | 68.43 | 60 | 2|
 | Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0    | 0.476 | 37.27 | 62.39 | 30| 4|
 
+### Stanford Online Products Retrieval Evaluation
+Mini-batch size=120. Architecture: Inception_Net V1.
+Optimizer: Adam. Number of iterations = 30K
+
+| Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
+|-----------|------------|--------|-------|-------|-------|--------------|--------------------|
+| Hard Negatives | No | 1.0    | 0.895 | 72.03 | 82.55 | 20| 6|
+
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
 * Tensorflow 1+ [Tested on 1.8]
 
 ### Code Setup
-1. train.py
-2. embed.py
-3. eval.py
+1. Update the directories' paths in constants.py 
+2. train.py
+3. embed.py
+4. eval.py
 
 ### TODO
 * [TODO] bash script for train, embed and then eval
