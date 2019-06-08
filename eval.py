@@ -1,28 +1,22 @@
+import os
 import sys
+import h5py
 sys.path.append('..')
 sys.path.append('/vulcan/scratch/ahmdtaha/libs/kmcuda/src')
-import numpy as np
 import common
-import os
-from argparse import ArgumentParser, FileType
-from ranking import METRIC_CHOICES
-import h5py
+import numpy as np
 import tensorflow as tf
-from sklearn.metrics import normalized_mutual_info_score
+import constants as const
+from ranking import METRIC_CHOICES
 from sklearn.cluster import KMeans
 from libKMCUDA import kmeans_cuda
 from scipy.spatial.distance import pdist
+from argparse import ArgumentParser, FileType
+from sklearn.metrics import normalized_mutual_info_score
 import logging.config
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 parser = ArgumentParser(description='Evaluate a ReID embedding.')
-parser.add_argument(
-    '--excluder', required=True, choices=('market1501', 'diagonal','duke'),
-    help='Excluder function to mask certain matches. Especially for multi-'
-         'camera datasets, one often excludes pictures of the query person from'
-         ' the gallery if it is taken from the same camera. The `diagonal`'
-         ' excluder should be used if this is *not* required.')
-
 
 parser.add_argument(
     '--gallery_dataset', required=True,
@@ -118,37 +112,26 @@ def main(argv):
 
 if __name__ == '__main__':
 
-    import getpass
-    username = getpass.getuser()
-    if username == 'ataha':
-        arg_experiment_root = '/mnt/work/datasets/Market-1501-v15.09.15/experiment/'
-    elif username == 'ahmedtaha':
-        arg_experiment_root = '/Users/ahmedtaha/Documents/dataset/Market-1501-v15.09.15/experiment/'
-    elif username == 'ahmdtaha':
-        arg_experiment_root = '/vulcan/scratch/ahmdtaha/Market-1501-v15.09.15/experiment/'
-    else:
-        raise NotImplementedError('Username {} not valid'.format(username))
-
-    dataset_name = 'inshop'
+    arg_experiment_root = const.experiment_root_dir
+    dataset_name = 'stanford'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'inshop_densenet_fc1024_hard_triplet_m_1.0'
+    exp_dir = 'stanford_inc_v1_direct_hard_triplet_m_1.0'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 
     if dataset_name == 'cub':
-        # db_dir = 'DukeMTMC-reID'
         csv_file = 'cub'
-        excluder = 'diagonal'
     elif dataset_name == 'inshop':
         csv_file = 'deep_fashion'
-        excluder = 'diagonal'
+    elif dataset_name == 'stanford':
+        csv_file = 'stanford_online'
+
     else:
         raise  NotImplementedError('dataset {} not valid'.format(dataset_name))
 
 
     argv = [
-        #'--excluder' ,'duke',
-        '--excluder',excluder ,
+
         '--gallery_dataset','./data/'+csv_file+'_test.csv',
         '--gallery_embeddings',os.path.join(exp_root ,'test_embeddings_augmented.h5'),
         '--metric','euclidean',

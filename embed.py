@@ -6,6 +6,7 @@ import psutil
 import common
 import numpy as np
 import tensorflow as tf
+import constants as const
 from itertools import count
 from aggregators import AGGREGATORS
 from argparse import ArgumentParser
@@ -13,6 +14,7 @@ from importlib import import_module
 from utils import os_utils
 from tensorflow.contrib import slim
 import logging.config
+
 
 parser = ArgumentParser(description='Embed a dataset using a trained network.')
 
@@ -290,27 +292,21 @@ def main(argv):
 
 if __name__ == '__main__':
 
-    import getpass
-    username = getpass.getuser()
 
-    if username == 'ataha':
-        arg_experiment_root = '/mnt/work/datasets/Market-1501-v15.09.15/experiment/'
-    elif username == 'ahmedtaha':
-        arg_experiment_root = '/Users/ahmedtaha/Documents/dataset/Market-1501-v15.09.15/experiment/'
-    elif username == 'ahmdtaha':
-        arg_experiment_root = '/vulcan/scratch/ahmdtaha/Market-1501-v15.09.15/experiment/'
-    else:
-        raise NotImplementedError('Username {} not valid'.format(username))
+
+    arg_experiment_root = const.experiment_root_dir
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for subset in ['test']:
-        exp_dir = 'inshop_densenet_fc1024_hard_triplet_m_1.0'
+        exp_dir = 'stanford_inc_v1_direct_hard_triplet_m_1.0'
         folder_name = 'emb'
-        dataset_name = 'inshop'
+        dataset_name = 'stanford'
         if dataset_name == 'cub':
             csv_file = 'cub'
         elif dataset_name == 'inshop':
             csv_file = 'deep_fashion'
+        elif dataset_name == 'stanford':
+            csv_file = 'stanford_online'
         else:
             raise NotImplementedError('dataset {} not valid'.format(dataset_name))
 

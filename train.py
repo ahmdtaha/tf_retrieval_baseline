@@ -14,7 +14,7 @@ import tensorflow as tf
 from tensorflow.contrib import slim
 
 import matplotlib
-
+import constants as const
 matplotlib.use('Agg')
 
 import common
@@ -515,35 +515,11 @@ def main(argv):
 
 if __name__ == '__main__':
 
-    import getpass
-    username = getpass.getuser()
-    if username == 'ahmedtaha':
+    dataset_dir = const.dataset_dir
+    trained_models_dir = const.trained_models_dir
+    experiment_root_dir = const.experiment_root_dir
 
-        dataset_dir = '/Users/ahmedtaha/Documents/dataset/'
-        # dataset_dir = '/Volumes/Backup/datasets/'
-        trained_models_dir = '/Users/ahmedtaha/Documents/Model/'
-        experiment_root_dir = '/Users/ahmedtaha/Documents/dataset/retrieval_baseline/'
-        local = True
-    elif username == 'ataha':
-
-        dataset_dir = '/mnt/work/datasets/'
-        trained_models_dir = '/mnt/work/datasets/Model/'
-        experiment_root_dir = dataset_dir + 'Market-1501-v15.09.15/experiment/'
-
-        local = False
-    elif username == 'ahmdtaha':
-
-        # dataset_dir = '/scratch0/ahmdtaha/'
-        dataset_dir = '/vulcan/scratch/ahmdtaha/'
-        trained_models_dir = '/vulcan/scratch/ahmdtaha/weights/'
-        experiment_root_dir = '/vulcan/scratch/ahmdtaha/' + 'Market-1501-v15.09.15/experiment/'
-
-        local = False
-    else:
-        raise NotImplementedError('User {} not found'.format(username))
-
-
-    dataset_name = 'inshop'
+    dataset_name = 'stanford'
 
     if dataset_name == 'cub':
         db_dir = 'CUB_200_2011/images'
@@ -563,14 +539,23 @@ if __name__ == '__main__':
             '--batch_k', '6',
             '--optimizer', 'adam',
         ]
+    elif dataset_name == 'stanford':
+        db_dir = 'Stanford_Online_Products'
+        train_file = 'stanford_online_train.csv'
+        extra_args = [
+            # p_10,k_6
+            '--batch_p', '20',
+            '--batch_k', '6',
+            '--train_iterations', '30000',
+            '--optimizer', 'adam',
+        ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'hard_triplet'
-    arg_head = 'fc1024'
-    arg_margin = '1.0'
-    arg_arch = 'densenet'
-
+    arg_loss = 'semi_hard_triplet'
+    arg_head = 'direct_normalize'
+    arg_margin = '0.2'
+    arg_arch = 'inc_v1'
 
 
     exp_name = [dataset_name, arg_arch, arg_head, arg_loss, 'm_{}'.format(arg_margin)]
