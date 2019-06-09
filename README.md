@@ -52,11 +52,10 @@ Optimizer: Adam. Number of iterations = 30K
 4. eval.py
 
 ### Wiki
-To be added
+* [Done] [Explain the fast contrastive loss sampling procedure](https://github.com/ahmdtaha/tf_retrieval_baseline/wiki/Contrastive-loss-with-tf.Data)
 
 ### TODO
 * [TODO] bash script for train, embed and then eval
-* [TODO] Explain the fast contrastive loss sampling procedure
 * [TODO] Explain why contrastive loss is different from [tf.contrib.losses.metric_learning.contrastive\_loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss)
 * [TODO] Evaluate on CUB (a small dataset) with a small architecture like ResNet
 * [TODO] Evaluate space embedding during training.
