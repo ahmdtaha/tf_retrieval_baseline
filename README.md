@@ -60,3 +60,7 @@ To be added
 * [TODO] Explain why contrastive loss is different from [tf.contrib.losses.metric_learning.contrastive\_loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss)
 * [TODO] Evaluate on CUB (a small dataset) with a small architecture like ResNet
 * [TODO] Evaluate space embedding during training.
+
+
+### Misc Notes
+* I noticed that some methods depend heavily on training parameters like the optimizer and number of iterations. For example, the semi-hard negative performance drops significantly on CUB-dataset if Adam optimizer is used instead of Momentum! The number of iterations seems also matter for this small dataset. 
