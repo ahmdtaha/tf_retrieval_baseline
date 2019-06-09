@@ -37,7 +37,9 @@ Optimizer: Adam. Number of iterations = 30K
 
 | Method    | Normalized | Margin | NMI   | R@1   | R@4   | # of classes | #samples per class |
 |-----------|------------|--------|-------|-------|-------|--------------|--------------------|
+| [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.893 | 71.22 | 81.77 | 20| 6|
 | Hard Negatives | No | 1.0    | 0.895 | 72.03 | 82.55 | 20| 6|
+| [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.889 | 68.26 | 79.72 | 20| 6|
 
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
@@ -48,6 +50,9 @@ Optimizer: Adam. Number of iterations = 30K
 2. train.py
 3. embed.py
 4. eval.py
+
+### Wiki
+To be added
 
 ### TODO
 * [TODO] bash script for train, embed and then eval
