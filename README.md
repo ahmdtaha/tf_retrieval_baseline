@@ -40,6 +40,9 @@ Optimizer: Adam. Number of iterations = 30K
 | [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | Yes | 0.2    | 0.893 | 71.22 | 81.77 | 20| 6|
 | Hard Negatives | No | 1.0    | 0.895 | 72.03 | 82.55 | 20| 6|
 | [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | No | 1.0    | 0.889 | 68.26 | 79.72 | 20| 6|
+| [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | No | N/A    | 0.893 | 72.60 | 82.59 | 60| 2|
+| [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.878 | 60.30 | 72.78 | 60 | 2|
+| Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0    | 0.825 | 19.05 | 32.28 | 30| 4|
 
 ### Requirements
 * Python 3+ [Tested on 3.4.7]
