@@ -56,11 +56,10 @@ Optimizer: Adam. Number of iterations = 30K
 
 ### Wiki
 * [Done] [Explain the fast contrastive loss sampling procedure](https://github.com/ahmdtaha/tf_retrieval_baseline/wiki/Contrastive-loss-with-tf.Data)
+* [Done] The contrastive loss in the repos is customized to avoid nan during training. When the anchor and positive belong to the same class and the distance between their embeddings is near zero, the derivative turns into nan. [Lei Mao](https://leimao.github.io/article/Siamese-Network-MNIST/) provides a nice detailed mathematical explanation for this issue.
 
 ### TODO
 * [TODO] bash script for train, embed and then eval
-* [TODO] Explain why contrastive loss is different from [tf.contrib.losses.metric_learning.contrastive\_loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss)
-* [TODO] Evaluate on CUB (a small dataset) with a small architecture like ResNet
 * [TODO] Evaluate space embedding during training.
 
 
