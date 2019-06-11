@@ -115,7 +115,7 @@ if __name__ == '__main__':
     arg_experiment_root = const.experiment_root_dir
     dataset_name = 'stanford'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'stanford_inc_v1_direct_hard_triplet_m_1.0'
+    exp_dir = 'stanford_inc_v1_direct_npairs_loss_m_1.0'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 

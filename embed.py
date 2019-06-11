@@ -298,7 +298,7 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for subset in ['test']:
-        exp_dir = 'stanford_inc_v1_direct_hard_triplet_m_1.0'
+        exp_dir = 'stanford_inc_v1_direct_npairs_loss_m_1.0'
         folder_name = 'emb'
         dataset_name = 'stanford'
         if dataset_name == 'cub':

@@ -544,17 +544,17 @@ if __name__ == '__main__':
         train_file = 'stanford_online_train.csv'
         extra_args = [
             # p_10,k_6
-            '--batch_p', '20',
-            '--batch_k', '6',
+            '--batch_p', '60',
+            '--batch_k', '2',
             '--train_iterations', '30000',
             '--optimizer', 'adam',
         ]
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'semi_hard_triplet'
-    arg_head = 'direct_normalize'
-    arg_margin = '0.2'
+    arg_loss = 'npairs_loss'
+    arg_head = 'direct'
+    arg_margin = '1.0'
     arg_arch = 'inc_v1'
 
 
