@@ -154,15 +154,15 @@ def fid_to_image(fid, pid, image_root, image_size):
     # fid = tf.Print(fid,[fid, pid],'fid ::')
     """ Loads and resizes an image given by FID. Pass-through the PID. """
     # Since there is no symbolic path.join, we just add a '/' to be sure.
-    image_encoded = tf.read_file(tf.reduce_join([image_root, '/', fid]))
+    image_encoded = tf.io.read_file(tf.strings.reduce_join([image_root, '/', fid]))
 
     # tf.image.decode_image doesn't set the shape, not even the dimensionality,
     # because it potentially loads animated .gif files. Instead, we use either
     # decode_jpeg or decode_png, each of which can decode both.
     # Sounds ridiculous, but is true:
     # https://github.com/tensorflow/tensorflow/issues/9356#issuecomment-309144064
-    image_decoded = tf.image.decode_jpeg(image_encoded, channels=3)
-    image_resized = tf.image.resize_images(image_decoded, image_size)
+    image_decoded = tf.io.decode_jpeg(image_encoded, channels=3)
+    image_resized = tf.image.resize(image_decoded, image_size)
 
     return image_resized, fid, pid
 
