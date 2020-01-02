@@ -191,10 +191,15 @@ def sample_k_fids_for_pid(pid, all_fids, all_pids, batch_k):
 
 
 def main(argv):
+
+
     args = parser.parse_args(argv)
 
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+
+    # physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    # tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
     # We store all arguments in a json file. This has two advantages:
@@ -318,9 +323,59 @@ def main(argv):
     dataset = dataset.prefetch(1)
 
     # Since we repeat the data infinitely, we only need a one-shot iterator.
-    # images, fids, pids = dataset.make_one_shot_iterator().get_next()
+
+    # Create the model and an embedding head.
+    # model = import_module('nets.' + args.model_name)
+    # head = import_module('heads.' + args.head_name)
+
+    # Feed the image through the model. The returned `body_prefix` will be used
+    # further down to load the pre-trained weights for all variables with this
+    # prefix.
+
+
+    endpoints = {}
+    base_model = tf.keras.applications.Xception(weights='imagenet', include_top=False)
+    spatial_pooling = tf.keras.layers.GlobalAvgPool2D()
+    embedding_head = tf.keras.layers.Dense(args.embedding_dim, activation=None,
+                                           kernel_initializer=tf.keras.initializers.Orthogonal())
+
+    # Define the optimizer and the learning-rate schedule.
+    # Unfortunately, we get NaNs if we don't handle no-decay separately.
+    global_step = tf.Variable(0, name='global_step', trainable=False)
+
+    if 0 <= args.decay_start_iteration < args.train_iterations:
+        learning_rate = tf.optimizers.schedules.PolynomialDecay(args.learning_rate, args.train_iterations,
+                                                  end_learning_rate=1e-7)
+    else:
+        learning_rate = args.learning_rate
+
+    if args.optimizer == 'adam':
+        optimizer = tf.keras.optimizers.Adam(learning_rate)
+    elif args.optimizer == 'momentum':
+        optimizer = tf.keras.optimizers.SGD(learning_rate, momentum=0.9)
+    else:
+        raise NotImplementedError('Invalid optimizer {}'.format(args.optimizer))
+
+    def train_step(images, fids, pids ):
+
+        with tf.GradientTape() as tape:
+            base_model_output = base_model(images)
+            base_model_output_pooled = spatial_pooling(base_model_output)
+            embed = embedding_head(base_model_output_pooled )
+
+
+
     for batch_idx, batch in enumerate(dataset):
         images, fids, pids = batch
+        train_step(images, fids, pids)
+
+        weight_decay = 10e-4
+        # weights_regularizer = tf.keras.regularizers.l2(l=weight_decay)
+        # endpoints, body_prefix = model.endpoints(images, is_training=True)
+
+
+
+
         print(fids)
 
 
@@ -355,7 +410,7 @@ if __name__ == '__main__':
         train_file = 'stanford_online_train.csv'
         extra_args = [
             # p_10,k_6
-            '--batch_p', '60',
+            '--batch_p', '20',
             '--batch_k', '2',
             '--train_iterations', '30000',
             '--optimizer', 'adam',
