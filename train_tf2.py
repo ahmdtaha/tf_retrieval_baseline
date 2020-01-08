@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-from argparse import ArgumentParser
-from datetime import timedelta
-from importlib import import_module
-import logging.config
+
+
 import os
-from signal import SIGINT, SIGTERM
 import sys
 import time
-
 import json
 import numpy as np
+import os.path as osp
+import logging.config
 import tensorflow as tf
+from datetime import timedelta
+from signal import SIGINT, SIGTERM
+from argparse import ArgumentParser
+from importlib import import_module
 # from tensorflow.contrib import slim
 
 import matplotlib
@@ -21,13 +23,15 @@ import common
 import lbtoolbox as lb
 from nets import NET_CHOICES
 from heads import HEAD_CHOICES
-from ranking import LOSS_CHOICES,METRIC_CHOICES
-from ranking.hard_triplet import batch_hard
-from ranking.semi_hard_triplet import triplet_semihard_loss
-from ranking.lifted_structured import lifted_loss
 from ranking.npair import npairs_loss
 from ranking.angular import angular_loss
+from ranking.hard_triplet import batch_hard
+from ranking import LOSS_CHOICES,METRIC_CHOICES
+from model.embedding_model import EmbeddingModel
 from ranking.contrastive import contrastive_loss
+from ranking.lifted_structured import lifted_loss
+from ranking.semi_hard_triplet import triplet_semihard_loss
+
 
 
 OPTIMIZER_CHOICES = (
@@ -198,6 +202,8 @@ def main(argv):
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
+    # tf.compat.v1.disable_eager_execution()
+
     # physical_devices = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
@@ -332,12 +338,11 @@ def main(argv):
     # further down to load the pre-trained weights for all variables with this
     # prefix.
 
+    emb_model = EmbeddingModel(args)
 
-    endpoints = {}
-    base_model = tf.keras.applications.Xception(weights='imagenet', include_top=False)
-    spatial_pooling = tf.keras.layers.GlobalAvgPool2D()
-    embedding_head = tf.keras.layers.Dense(args.embedding_dim, activation=None,
-                                           kernel_initializer=tf.keras.initializers.Orthogonal())
+
+
+    # all_trainable_variables = embedding_head.trainable_variables+base_model.trainable_variables
 
     # Define the optimizer and the learning-rate schedule.
     # Unfortunately, we get NaNs if we don't handle no-decay separately.
@@ -356,27 +361,71 @@ def main(argv):
     else:
         raise NotImplementedError('Invalid optimizer {}'.format(args.optimizer))
 
-    def train_step(images, fids, pids ):
+    @tf.function
+    def train_step(images, pids ):
 
         with tf.GradientTape() as tape:
-            base_model_output = base_model(images)
-            base_model_output_pooled = spatial_pooling(base_model_output)
-            embed = embedding_head(base_model_output_pooled )
+            normalized_batch_embedding = emb_model(images)
+            if args.loss == 'semi_hard_triplet':
+                embedding_loss = triplet_semihard_loss(normalized_batch_embedding, pids, args.margin)
+            elif args.loss == 'hard_triplet':
+                embedding_loss = batch_hard(normalized_batch_embedding, pids, args.margin, args.metric)
+            elif args.loss == 'lifted_loss':
+                embedding_loss = lifted_loss(pids, normalized_batch_embedding, margin=args.margin)
+            else:
+                embedding_loss = 0
+            loss_mean = tf.reduce_mean(embedding_loss)
 
 
+        gradients = tape.gradient(loss_mean, emb_model.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, emb_model.trainable_variables))
 
-    for batch_idx, batch in enumerate(dataset):
-        images, fids, pids = batch
-        train_step(images, fids, pids)
+        return embedding_loss
 
-        weight_decay = 10e-4
-        # weights_regularizer = tf.keras.regularizers.l2(l=weight_decay)
-        # endpoints, body_prefix = model.endpoints(images, is_training=True)
+    # sess = tf.compat.v1.Session()
+    # start_step = sess.run(global_step)
+    # checkpoint_saver = tf.train.Saver(max_to_keep=2)
+    start_step = 0
+    log.info('Starting training from iteration {}.'.format(start_step))
+    dataset_iter = iter(dataset)
 
+    ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer=optimizer, net=emb_model)
+    manager = tf.train.CheckpointManager(ckpt, osp.join(args.experiment_root,'tf_ckpts'), max_to_keep=3)
 
+    ckpt.restore(manager.latest_checkpoint)
+    if manager.latest_checkpoint:
+        print("Restored from {}".format(manager.latest_checkpoint))
+    else:
+        print("Initializing from scratch.")
 
+    with lb.Uninterrupt(sigs=[SIGINT, SIGTERM], verbose=True) as u:
+        for i in range(ckpt.step.numpy(), args.train_iterations):
+            # for batch_idx, batch in enumerate():
+            start_time = time.time()
+            images, fids, pids = next(dataset_iter)
+            batch_loss = train_step(images, pids)
+            elapsed_time = time.time() - start_time
+            seconds_todo = (args.train_iterations - i) * elapsed_time
+            # print(tf.reduce_min(batch_loss).numpy(),tf.reduce_mean(batch_loss).numpy(),tf.reduce_max(batch_loss).numpy())
+            log.info('iter:{:6d}, loss min|avg|max: {:.3f}|{:.3f}|{:6.3f}, ETA: {} ({:.2f}s/it)'.format(
+                i,
+                tf.reduce_min(batch_loss).numpy(),tf.reduce_mean(batch_loss).numpy(),tf.reduce_max(batch_loss).numpy(),
+                # args.batch_k - 1, float(b_prec_at_k),
+                timedelta(seconds=int(seconds_todo)),
+                elapsed_time))
 
-        print(fids)
+            ckpt.step.assign_add(1)
+            if (args.checkpoint_frequency > 0 and i % args.checkpoint_frequency == 0):
+                # emb_model.save(os.path.join(args.experiment_root, 'checkpoint_{0:04d}.h5'.format(i)))
+                emb_model.save_weights(os.path.join(args.experiment_root, 'model_weights_{0:04d}.w'.format(i)))
+                manager.save()
+
+            # Stop the main-loop at the end of the step, if requested.
+            if u.interrupted:
+                log.info("Interrupted on request!")
+                break
+
+    # print(fids)
 
 
 if __name__ == '__main__':
@@ -385,14 +434,14 @@ if __name__ == '__main__':
     trained_models_dir = const.trained_models_dir
     experiment_root_dir = const.experiment_root_dir
 
-    dataset_name = 'stanford'
+    dataset_name = 'cub'
 
     if dataset_name == 'cub':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
         extra_args = [
-            '--batch_p', '20',
-            '--batch_k', '6',
+            '--batch_p', '10',
+            '--batch_k', '5',
             '--train_iterations','10000',
             '--optimizer', 'momentum',
         ]
@@ -418,8 +467,8 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'npairs_loss'
-    arg_head = 'direct'
+    arg_loss = 'semi_hard_triplet'
+    arg_head = 'fc1024_normalize'
     arg_margin = '1.0'
     arg_arch = 'inc_v1'
 
@@ -443,11 +492,11 @@ if __name__ == '__main__':
         '--flip_augment',
         '--crop_augment',
 
-        '--resume',
+        # '--resume',
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
-        '--gpu', '0',
+        '--gpu', '1',
     ]
     args.extend([
 

@@ -188,13 +188,13 @@ def triplet_semihard_loss(embeddings,labels, margin=1.0):
   mask_final = array_ops.reshape(
       math_ops.greater(
           math_ops.reduce_sum(
-              math_ops.cast(mask, dtype=dtypes.float32), 1, keepdims=True),
+              tf.cast(mask, dtype=dtypes.float32), 1, keepdims=True),
           0.0), [batch_size, batch_size])
   mask_final = array_ops.transpose(mask_final)
 
-  adjacency_not = math_ops.cast(adjacency_not, dtype=dtypes.float32)
+  adjacency_not = tf.cast(adjacency_not, dtype=dtypes.float32)
 
-  mask = math_ops.cast(mask, dtype=dtypes.float32)
+  mask = tf.cast(mask, dtype=dtypes.float32)
 
   # negatives_outside: smallest D_an where D_an > D_ap.
   negatives_outside = array_ops.reshape(
@@ -223,7 +223,7 @@ def triplet_semihard_loss(embeddings,labels, margin=1.0):
           'The margin {} is not implemented in batch_hard'.format(margin))
 
 
-  mask_positives = math_ops.cast(
+  mask_positives = tf.cast(
       adjacency, dtype=dtypes.float32) - array_ops.diag(
           array_ops.ones([batch_size]))
 

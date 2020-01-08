@@ -4,16 +4,17 @@ import h5py
 sys.path.append('..')
 sys.path.append('/vulcan/scratch/ahmdtaha/libs/kmcuda/src')
 import common
+import logging.config
 import numpy as np
 import tensorflow as tf
 import constants as const
 from ranking import METRIC_CHOICES
 from sklearn.cluster import KMeans
-from libKMCUDA import kmeans_cuda
+# from libKMCUDA import kmeans_cuda
 from scipy.spatial.distance import pdist
 from argparse import ArgumentParser, FileType
 from sklearn.metrics import normalized_mutual_info_score
-import logging.config
+
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 parser = ArgumentParser(description='Evaluate a ReID embedding.')
@@ -48,22 +49,6 @@ def get_distance_matrix(x):
 def evaluate_emb(emb, labels):
     """Evaluate embeddings based on Recall@k."""
     d_mat = get_distance_matrix(emb)
-    #d_mat = pdist(emb)
-    # from sklearn.metrics import pairwise_distances
-    # x = np.random.rand(3,2)
-    # y = np.random.rand(3, 2)
-    # print(pairwise_distances(x))
-    # print(pairwise_distances(y))
-    # print(pairwise_distances(x,y))
-
-    #from eucl_dist import metrics
-    #print()
-    #d_mat = metrics.euclidean_distances(emb,emb,inverse=False)
-    #quit()
-    #from eucl_dist.gpu_dist import dist as gdist
-    #d_mat = gdist(emb)
-    #labels = labels
-
     names = []
     accs = []
     for k in [1, 2, 4, 8, 16]:
@@ -95,14 +80,16 @@ def main(argv):
 
     num_clusters = len(np.unique(gallery_pids))
     print('Start clustering K ={}'.format(num_clusters))
-    #kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(gallery_embs)
-    #print('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, kmeans.labels_)))
 
-    centroids, assignments = kmeans_cuda(gallery_embs,num_clusters,seed=3)
     log.info(exp_root)
-    log.info('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, assignments)))
-    log.info('Clustering complete')
 
+    kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(gallery_embs)
+    print('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, kmeans.labels_)))
+
+    # centroids, assignments = kmeans_cuda(gallery_embs,num_clusters,seed=3)
+    # log.info('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, assignments)))
+
+    log.info('Clustering complete')
 
 
     log.info('Eval with Recall-K')
@@ -113,9 +100,9 @@ def main(argv):
 if __name__ == '__main__':
 
     arg_experiment_root = const.experiment_root_dir
-    dataset_name = 'stanford'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'stanford_inc_v1_direct_npairs_loss_m_1.0'
+    dataset_name = 'cub'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    exp_dir = 'cub_inc_v1_direct_semi_hard_triplet_m_1.0'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 

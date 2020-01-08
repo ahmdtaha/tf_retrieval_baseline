@@ -553,7 +553,7 @@ if __name__ == '__main__':
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
     arg_loss = 'npairs_loss'
-    arg_head = 'direct'
+    arg_head = 'fc1024'
     arg_margin = '1.0'
     arg_arch = 'inc_v1'
 
