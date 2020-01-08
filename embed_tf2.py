@@ -212,7 +212,7 @@ def main(argv):
 
     # Overlap producing and consuming.
     dataset = dataset.prefetch(1)
-
+    tf.keras.backend.set_learning_phase(0)
     emb_model = EmbeddingModel(args)
 
     with h5py.File(args.filename, 'w') as f_out:
@@ -271,9 +271,9 @@ if __name__ == '__main__':
 
     arg_experiment_root = const.experiment_root_dir
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     for subset in ['test']:
-        exp_dir = 'cub_inc_v1_direct_semi_hard_triplet_m_1.0'
+        exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2'
         folder_name = 'emb'
         dataset_name = 'cub'
         if dataset_name == 'cub':

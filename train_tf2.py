@@ -337,7 +337,7 @@ def main(argv):
     # Feed the image through the model. The returned `body_prefix` will be used
     # further down to load the pre-trained weights for all variables with this
     # prefix.
-
+    tf.keras.backend.set_learning_phase(1)
     emb_model = EmbeddingModel(args)
 
 
@@ -416,8 +416,10 @@ def main(argv):
 
             ckpt.step.assign_add(1)
             if (args.checkpoint_frequency > 0 and i % args.checkpoint_frequency == 0):
-                # emb_model.save(os.path.join(args.experiment_root, 'checkpoint_{0:04d}.h5'.format(i)))
-                emb_model.save_weights(os.path.join(args.experiment_root, 'model_weights_{0:04d}.w'.format(i)))
+
+                # uncomment if you want to save the model weight separately
+                # emb_model.save_weights(os.path.join(args.experiment_root, 'model_weights_{0:04d}.w'.format(i)))
+
                 manager.save()
 
             # Stop the main-loop at the end of the step, if requested.
@@ -468,8 +470,8 @@ if __name__ == '__main__':
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
     arg_loss = 'semi_hard_triplet'
-    arg_head = 'fc1024_normalize'
-    arg_margin = '1.0'
+    arg_head = 'direct_normalize'
+    arg_margin = '0.2'
     arg_arch = 'inc_v1'
 
 
@@ -496,7 +498,7 @@ if __name__ == '__main__':
         '--head_name', arg_head,
         '--margin', arg_margin,
         '--loss', arg_loss,
-        '--gpu', '1',
+        '--gpu', '0',
     ]
     args.extend([
 

@@ -44,15 +44,22 @@ Optimizer: Adam. Number of iterations = 30K
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.878 | 60.30 | 72.78 | 60 | 2|
 | Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0    | 0.825 | 19.05 | 32.28 | 30| 4|
 
+## Release History
+
+* 0.0.1
+    * CHANGE: Jan 8,2020. Update code to support Tensorflow 2.0
+    * CHANGE: Dec 31, 2019. Update code to support Tensorflow 1.14
+    * First Commit: May 24, 2019. Code tested on Tensorflow 1.8
+    
 ### Requirements
-* Python 3+ [Tested on 3.4.7]
-* Tensorflow 1+ [Tested on 1.8]
+* Python 3+ [Tested on 3.4.7 / 3.7]
+* Tensorflow 1 and TF 2.0 [Tested on 1.8 / 1.14 / 2.0]
 
 ### Code Setup
-1. Update the directories' paths in constants.py 
-2. train.py
-3. embed.py
-4. eval.py
+1. Update the directories' paths in constants.py. 
+2. Use train.py and train_tf2.py for TF 1.X and TF 2.X, respectively.
+3. Use embed.py and embed_tf2.py for TF 1.X and TF 2.X, respectively.
+4. eval.py.
 
 ### Wiki
 * [Done] [Explain the fast contrastive loss sampling procedure](https://github.com/ahmdtaha/tf_retrieval_baseline/wiki/Contrastive-loss-with-tf.Data)
@@ -64,4 +71,5 @@ Optimizer: Adam. Number of iterations = 30K
 
 
 ### Misc Notes
-* I noticed that some methods depend heavily on training parameters like the optimizer and number of iterations. For example, the semi-hard negative performance drops significantly on CUB-dataset if Adam optimizer is used instead of Momentum! The number of iterations seems also matter for this small dataset. 
+* I noticed that some methods depend heavily on training parameters like the optimizer and number of iterations. For example, the semi-hard negative performance drops significantly on CUB-dataset if Adam optimizer is used instead of Momentum! The number of iterations seems also matter for this small dataset.
+* The Tensorflow 2.0 implementation uses more memory if when disabling the eager execution. I tested the code with a smaller batch size -- ten classes and five samples per class. After training for 10K iterations, the performance achieved is NMI=0.54, R@1=42.64, R@4=66.52. 

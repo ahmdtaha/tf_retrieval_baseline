@@ -84,7 +84,7 @@ def main(argv):
     log.info(exp_root)
 
     kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(gallery_embs)
-    print('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, kmeans.labels_)))
+    log.info('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, kmeans.labels_)))
 
     # centroids, assignments = kmeans_cuda(gallery_embs,num_clusters,seed=3)
     # log.info('NMI :: {}'.format(normalized_mutual_info_score(gallery_pids, assignments)))
@@ -101,8 +101,8 @@ if __name__ == '__main__':
 
     arg_experiment_root = const.experiment_root_dir
     dataset_name = 'cub'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-    exp_dir = 'cub_inc_v1_direct_semi_hard_triplet_m_1.0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 
