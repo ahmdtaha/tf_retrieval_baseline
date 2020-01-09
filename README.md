@@ -61,6 +61,19 @@ Optimizer: Adam. Number of iterations = 30K
 3. Use embed.py and embed_tf2.py for TF 1.X and TF 2.X, respectively.
 4. eval.py.
 
+### Supported Ranking losses
+* Triplet Loss with hard mining - 'hard_triplet'
+* Triplet Loss with semi-hard mining - 'semi_hard_triplet'
+* Lifted Structure Loss - 'lifted_loss'
+* N-pairs loss - 'npairs_loss'
+* Angular loss - 'angular_loss'
+* Contrastive loss - 'contrastive_loss'
+
+Keep an eye on `ranking/__init__.py` for new ranking loss
+
+
+
+
 ### Wiki
 * [Done] [Explain the fast contrastive loss sampling procedure](https://github.com/ahmdtaha/tf_retrieval_baseline/wiki/Contrastive-loss-with-tf.Data)
 * [Done] The contrastive loss in the repos is customized to avoid nan during training. When the anchor and positive belong to the same class and the distance between their embeddings is near zero, the derivative turns into nan. [Lei Mao](https://leimao.github.io/article/Siamese-Network-MNIST/) provides a nice detailed mathematical explanation for this issue.
