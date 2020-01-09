@@ -44,12 +44,7 @@ Optimizer: Adam. Number of iterations = 30K
 | [Angular Loss](https://github.com/geonm/tf_angular_loss) | Yes | N/A    | 0.878 | 60.30 | 72.78 | 60 | 2|
 | Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | Yes | 1.0    | 0.825 | 19.05 | 32.28 | 30| 4|
 
-## Release History
 
-* 0.0.1
-    * CHANGE: Jan 8,2020. Update code to support Tensorflow 2.0
-    * CHANGE: Dec 31, 2019. Update code to support Tensorflow 1.14
-    * First Commit: May 24, 2019. Code tested on Tensorflow 1.8
     
 ### Requirements
 * Python 3+ [Tested on 3.4.7 / 3.7]
@@ -71,7 +66,16 @@ Optimizer: Adam. Number of iterations = 30K
 
 Keep an eye on `ranking/__init__.py` for new ranking loss
 
+### Recommeneded Setting for each loss
 
+| Method    | Setting |
+|-----------|------------|
+| [Semi-Hard](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss) | L2-Norm Yes, Margin =0.2 |
+| Hard Negatives | L2-Norm No , Margin =1.0 |
+| [Lifted Structured](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/lifted_struct_loss) | L2-Norm No , Margin =1.0 | 
+| [N-Pair Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/npairs_loss) | L2-Norm No , Margin =N/A | 
+| [Angular Loss](https://github.com/geonm/tf_angular_loss) | L2-Norm Yes, Margin =N/A | 
+| Custom [Contrastive Loss](https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/contrastive_loss) | L2-Norm Yes, Margin =1.0 | 
 
 
 ### Wiki
@@ -81,8 +85,16 @@ Keep an eye on `ranking/__init__.py` for new ranking loss
 ### TODO
 * [TODO] bash script for train, embed and then eval
 * [TODO] Evaluate space embedding during training.
+* [TODO] After supporting TF 2.0 (eager execution), It become easier to support more losses -- Maybe add Margin loss.
 
 
 ### Misc Notes
 * I noticed that some methods depend heavily on training parameters like the optimizer and number of iterations. For example, the semi-hard negative performance drops significantly on CUB-dataset if Adam optimizer is used instead of Momentum! The number of iterations seems also matter for this small dataset.
-* The Tensorflow 2.0 implementation uses more memory if when disabling the eager execution. I tested the code with a smaller batch size -- ten classes and five samples per class. After training for 10K iterations, the performance achieved is NMI=0.54, R@1=42.64, R@4=66.52. 
+* The Tensorflow 2.0 implementation uses more memory even when disabling the eager execution. I tested the code with a smaller batch size -- ten classes and five samples per class. After training for 10K iterations, the performance achieved is NMI=0.54, R@1=42.64, R@4=66.52. 
+
+## Release History
+
+* 0.0.1
+    * CHANGE: Jan 8, 2020. Update code to support Tensorflow 2.0
+    * CHANGE: Dec 31, 2019. Update code to support Tensorflow 1.14
+    * First Commit: May 24, 2019. Code tested on Tensorflow 1.8
