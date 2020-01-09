@@ -365,15 +365,57 @@ def main(argv):
     def train_step(images, pids ):
 
         with tf.GradientTape() as tape:
-            normalized_batch_embedding = emb_model(images)
+            batch_embedding = emb_model(images)
             if args.loss == 'semi_hard_triplet':
-                embedding_loss = triplet_semihard_loss(normalized_batch_embedding, pids, args.margin)
+                embedding_loss = triplet_semihard_loss(batch_embedding, pids, args.margin)
             elif args.loss == 'hard_triplet':
-                embedding_loss = batch_hard(normalized_batch_embedding, pids, args.margin, args.metric)
+                embedding_loss = batch_hard(batch_embedding, pids, args.margin, args.metric)
             elif args.loss == 'lifted_loss':
-                embedding_loss = lifted_loss(pids, normalized_batch_embedding, margin=args.margin)
+                embedding_loss = lifted_loss(pids, batch_embedding, margin=args.margin)
+            elif args.loss == 'contrastive_loss':
+                assert batch_size % 2 == 0
+                assert args.batch_k == 4  ## Can work with other number but will need tuning
+
+                contrastive_idx = np.tile([0, 1, 4, 3, 2, 5, 6, 7], args.batch_p // 2)
+                for i in range(args.batch_p // 2):
+                    contrastive_idx[i * 8:i * 8 + 8] += i * 8
+
+                contrastive_idx = np.expand_dims(contrastive_idx, 1)
+                batch_embedding_ordered = tf.gather_nd(batch_embedding, contrastive_idx)
+                pids_ordered = tf.gather_nd(pids, contrastive_idx)
+                # batch_embedding_ordered = tf.Print(batch_embedding_ordered,[pids_ordered],'pids_ordered :: ',summarize=1000)
+                embeddings_anchor, embeddings_positive = tf.unstack(
+                    tf.reshape(batch_embedding_ordered, [-1, 2, args.embedding_dim]), 2,
+                    1)
+                # embeddings_anchor = tf.Print(embeddings_anchor,[pids_ordered,embeddings_anchor,embeddings_positive,batch_embedding,batch_embedding_ordered],"Tensors ", summarize=1000)
+
+                fixed_labels = np.tile([1, 0, 0, 1], args.batch_p // 2)
+                # fixed_labels = np.reshape(fixed_labels,(len(fixed_labels),1))
+                # print(fixed_labels)
+                labels = tf.constant(fixed_labels)
+                # labels = tf.Print(labels,[labels],'labels ',summarize=1000)
+                embedding_loss = contrastive_loss(labels, embeddings_anchor, embeddings_positive,
+                                                margin=args.margin)
+            elif args.loss == 'angular_loss':
+                embeddings_anchor, embeddings_positive = tf.unstack(
+                    tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2,
+                    1)
+                # pids = tf.Print(pids, [pids], 'pids:: ', summarize=100)
+                pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
+                # pids = tf.Print(pids,[pids],'pids:: ',summarize=100)
+                embedding_loss = angular_loss(pids, embeddings_anchor, embeddings_positive,
+                                            batch_size=args.batch_p, with_l2reg=True)
+
+            # elif args.loss == 'npairs_loss':
+            #     assert args.batch_k == 2  ## Single positive pair per class
+            #     embeddings_anchor, embeddings_positive = tf.unstack(
+            #         tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2, 1)
+            #     pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
+            #     pids = tf.reshape(pids, [-1])
+            #     embedding_loss = npairs_loss(pids, embeddings_anchor, embeddings_positive)
+
             else:
-                embedding_loss = 0
+                raise NotImplementedError('Invalid Loss {}'.format(args.loss))
             loss_mean = tf.reduce_mean(embedding_loss)
 
 
@@ -442,8 +484,8 @@ if __name__ == '__main__':
         db_dir = 'CUB_200_2011/images'
         train_file = 'cub_train.csv'
         extra_args = [
-            '--batch_p', '10',
-            '--batch_k', '5',
+            '--batch_p', '20',
+            '--batch_k', '2',
             '--train_iterations','10000',
             '--optimizer', 'momentum',
         ]
@@ -469,7 +511,7 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'semi_hard_triplet'
+    arg_loss = 'angular_loss'
     arg_head = 'direct_normalize'
     arg_margin = '0.2'
     arg_arch = 'inc_v1'

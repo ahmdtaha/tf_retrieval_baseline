@@ -36,7 +36,7 @@ def angular_loss(input_labels, anchor_features, pos_features, degree=45, batch_s
     # assert lshape.shape == 1
     labels = tf.reshape(input_labels, [lshape[0], 1])
 
-    labels_remapped = tf.to_float(tf.equal(labels, tf.transpose(labels)))
+    labels_remapped = tf.cast(tf.equal(labels, tf.transpose(labels)),tf.float32)
     labels_remapped /= tf.reduce_sum(labels_remapped, 1, keepdims=True)
 
     xent_loss = tf.nn.softmax_cross_entropy_with_logits(logits=similarity_matrix, labels=labels_remapped)
