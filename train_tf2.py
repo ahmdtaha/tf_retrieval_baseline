@@ -406,13 +406,13 @@ def main(argv):
                 embedding_loss = angular_loss(pids, embeddings_anchor, embeddings_positive,
                                             batch_size=args.batch_p, with_l2reg=True)
 
-            # elif args.loss == 'npairs_loss':
-            #     assert args.batch_k == 2  ## Single positive pair per class
-            #     embeddings_anchor, embeddings_positive = tf.unstack(
-            #         tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2, 1)
-            #     pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
-            #     pids = tf.reshape(pids, [-1])
-            #     embedding_loss = npairs_loss(pids, embeddings_anchor, embeddings_positive)
+            elif args.loss == 'npairs_loss':
+                assert args.batch_k == 2  ## Single positive pair per class
+                embeddings_anchor, embeddings_positive = tf.unstack(
+                    tf.reshape(batch_embedding, [-1, 2, args.embedding_dim]), 2, 1)
+                pids, _ = tf.unstack(tf.reshape(pids, [-1, 2, 1]), 2, 1)
+                pids = tf.reshape(pids, [-1])
+                embedding_loss = npairs_loss(pids, embeddings_anchor, embeddings_positive)
 
             else:
                 raise NotImplementedError('Invalid Loss {}'.format(args.loss))
@@ -511,7 +511,7 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError('invalid dataset {}'.format(dataset_name))
 
-    arg_loss = 'angular_loss'
+    arg_loss = 'npairs_loss'
     arg_head = 'direct_normalize'
     arg_margin = '0.2'
     arg_arch = 'inc_v1'
