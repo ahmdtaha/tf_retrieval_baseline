@@ -34,7 +34,9 @@ class EmbeddingModel(tf.keras.Model):
         if cfg.model_name == 'inception_v1':
             self.base_model = tf.keras.applications.Xception(weights='imagenet', include_top=False)
         elif cfg.model_name == 'resnet_v1_50':
-            self.base_model = tf.keras.applications.Xception(weights='imagenet', include_top=False)
+            self.base_model = tf.keras.applications.ResNet50(weights='imagenet', include_top=False)
+        elif cfg.model_name == 'densenet169':
+            self.base_model = tf.keras.applications.DenseNet169(weights='imagenet', include_top=False)
         else:
             raise NotImplementedError('Invalid model_name {}'.format(cfg.model_name))
 

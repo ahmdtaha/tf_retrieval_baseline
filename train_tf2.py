@@ -331,14 +331,13 @@ def main(argv):
     # Since we repeat the data infinitely, we only need a one-shot iterator.
 
     # Create the model and an embedding head.
-    # model = import_module('nets.' + args.model_name)
-    # head = import_module('heads.' + args.head_name)
+    tf.keras.backend.set_learning_phase(1)
+    emb_model = EmbeddingModel(args)
 
     # Feed the image through the model. The returned `body_prefix` will be used
     # further down to load the pre-trained weights for all variables with this
     # prefix.
-    tf.keras.backend.set_learning_phase(1)
-    emb_model = EmbeddingModel(args)
+
 
 
 
@@ -346,8 +345,6 @@ def main(argv):
 
     # Define the optimizer and the learning-rate schedule.
     # Unfortunately, we get NaNs if we don't handle no-decay separately.
-    global_step = tf.Variable(0, name='global_step', trainable=False)
-
     if 0 <= args.decay_start_iteration < args.train_iterations:
         learning_rate = tf.optimizers.schedules.PolynomialDecay(args.learning_rate, args.train_iterations,
                                                   end_learning_rate=1e-7)
@@ -514,7 +511,7 @@ if __name__ == '__main__':
     arg_loss = 'npairs_loss'
     arg_head = 'direct_normalize'
     arg_margin = '0.2'
-    arg_arch = 'inc_v1'
+    arg_arch = 'densenet'
 
 
     exp_name = [dataset_name, arg_arch, arg_head, arg_loss, 'm_{}'.format(arg_margin)]
