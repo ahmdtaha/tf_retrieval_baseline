@@ -321,8 +321,13 @@ def main(argv):
         dataset = dataset.map(
             lambda im, fid, pid: (tf.image.random_crop(im, net_input_size + (3,)), fid, pid))
 
+    # Create the model and an embedding head.
+    tf.keras.backend.set_learning_phase(1)
+    emb_model = EmbeddingModel(args)
+
     # Group it back into PK batches.
     batch_size = args.batch_p * args.batch_k
+    dataset = dataset.map(lambda im, fid, pid: (emb_model.preprocess_input(im), fid, pid))
     dataset = dataset.batch(batch_size)
 
     # Overlap producing and consuming for parallelism.
@@ -330,9 +335,7 @@ def main(argv):
 
     # Since we repeat the data infinitely, we only need a one-shot iterator.
 
-    # Create the model and an embedding head.
-    tf.keras.backend.set_learning_phase(1)
-    emb_model = EmbeddingModel(args)
+
 
     # Feed the image through the model. The returned `body_prefix` will be used
     # further down to load the pre-trained weights for all variables with this

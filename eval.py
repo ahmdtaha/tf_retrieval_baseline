@@ -102,7 +102,7 @@ if __name__ == '__main__':
     arg_experiment_root = const.experiment_root_dir
     dataset_name = 'cub'
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2'
+    exp_dir = 'cub_densenet_direct_normalize_npairs_loss_m_0.2'
     foldername = 'emb'
     exp_root = os.path.join(arg_experiment_root+exp_dir,foldername)
 

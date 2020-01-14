@@ -207,13 +207,15 @@ def main(argv):
     else:
         modifiers = [o + '_resize' for o in modifiers]
 
+    emb_model = EmbeddingModel(args)
+
     # Group it back into PK batches.
     dataset = dataset.batch(args.batch_size)
-
+    dataset = dataset.map(lambda im, fid, pid: (emb_model.preprocess_input(im), fid, pid))
     # Overlap producing and consuming.
     dataset = dataset.prefetch(1)
     tf.keras.backend.set_learning_phase(0)
-    emb_model = EmbeddingModel(args)
+
 
     with h5py.File(args.filename, 'w') as f_out:
 
@@ -271,9 +273,9 @@ if __name__ == '__main__':
 
     arg_experiment_root = const.experiment_root_dir
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     for subset in ['test']:
-        exp_dir = 'cub_inc_v1_direct_normalize_semi_hard_triplet_m_0.2'
+        exp_dir = 'cub_densenet_direct_normalize_npairs_loss_m_0.2'
         folder_name = 'emb'
         dataset_name = 'cub'
         if dataset_name == 'cub':
@@ -290,7 +292,7 @@ if __name__ == '__main__':
             '--dataset', './data/'+csv_file+'_'+subset+'.csv',
             '--filename', subset+'_embeddings_augmented.h5',
             '--foldername',folder_name,
-
+            # '--batch_size','40',
         ]
         main(args)
 
