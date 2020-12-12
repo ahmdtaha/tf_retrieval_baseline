@@ -89,16 +89,16 @@ def flip_augment(image, fid, pid):
     images = tf.stack([image, tf.reverse(image, [1])])
     return images, tf.stack([fid]*2), tf.stack([pid]*2)
 
-
 def five_crops(image, crop_size):
     """ Returns the central and four corner crops of `crop_size` from `image`. """
     image_size = tf.shape(image)[:2]
     crop_margin = tf.subtract(image_size, crop_size)
-    assert_size = tf.assert_non_negative(
+    assert_size = tf.debugging.assert_non_negative(
         crop_margin, message='Crop size must be smaller or equal to the image size.')
     with tf.control_dependencies([assert_size]):
-        top_left = tf.floor_div(crop_margin, 2)
-        bottom_right = tf.add(top_left, crop_size)
+        top_left = tf.compat.v1.floor_div(crop_margin, 2)
+        bottom_right = tf.math.add(top_left, crop_size)
+
     center       = image[top_left[0]:bottom_right[0], top_left[1]:bottom_right[1]]
     top_left     = image[:-crop_margin[0], :-crop_margin[1]]
     top_right    = image[:-crop_margin[0], crop_margin[1]:]
@@ -292,6 +292,7 @@ if __name__ == '__main__':
             '--dataset', './data/'+csv_file+'_'+subset+'.csv',
             '--filename', subset+'_embeddings_augmented.h5',
             '--foldername',folder_name,
+            '--crop_augment','center', ## Make sure it follows the training resolution
             # '--batch_size','40',
         ]
         main(args)

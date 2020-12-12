@@ -83,7 +83,16 @@ parser.add_argument(
 
 
 def flip_augment(image, fid, pid):
-    """ Returns both the original and the horizontal flip of an image. """
+    """Returns both the original and the horizontal flip of an image.
+
+    Parameters
+    ---------
+    img: array of images
+    fid: array of image filepaths
+    pid: array of images ids
+
+    """
+
     images = tf.stack([image, tf.reverse(image, [1])])
     return images, tf.stack([fid]*2), tf.stack([pid]*2)
 
@@ -315,6 +324,7 @@ if __name__ == '__main__':
             '--dataset', './data/'+csv_file+'_'+subset+'.csv',
             '--filename', subset+'_embeddings_augmented.h5',
             '--foldername',folder_name,
+            '--crop_augment', 'center',  ## Make sure it follows the training resolution
 
         ]
         main(args)
